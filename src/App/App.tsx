@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { Dimensions } from 'react-native';
-import { useTransition } from 'react-spring/native';
+import { useTransition, config } from 'react-spring/native';
 
 import { Container, AnimatedPage, Title } from './styles';
 
@@ -28,19 +28,24 @@ export const App = () => {
 
   const { width } = Dimensions.get('window');
   const transitions = useTransition(index, p => p, {
-    intitial: { opacity: 1, translateX: 0 * width },
-    from: { opacity: 0.5, translateX: -1 * width },
-    enter: { opacity: 1, translateX: 0 * width },
-    leave: { opacity: 0.5, translateX: 1 * width },
+    intitial: { translateX: 0 * width },
+    from: { translateX: -1 * width },
+    enter: { translateX: 0 * width },
+    leave: { translateX: 1 * width },
+    config: (_, phase) => {
+      switch (phase) {
+        default:
+          return { friction: 20, tension: 120 };
+        case 'leave':
+          return config.molasses;
+      }
+    },
   });
-
   return (
     <Container onTouchStart={onTouchStart}>
-      {transitions.map(({ key, item, props: { opacity, translateX } }) => {
+      {transitions.map(({ key, item, props: { translateX } }) => {
         const Page = pages[item];
-        return (
-          <Page key={key} style={{ opacity, transform: [{ translateX }] }} />
-        );
+        return <Page key={key} style={{ transform: [{ translateX }] }} />;
       })}
     </Container>
   );
