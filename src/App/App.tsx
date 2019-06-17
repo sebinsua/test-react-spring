@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { Animated } from 'react-native';
+import { Dimensions } from 'react-native';
 import { useTransition } from 'react-spring/native';
 
 import { Container, AnimatedPage, Title } from './styles';
@@ -7,17 +7,17 @@ import { Container, AnimatedPage, Title } from './styles';
 const pages = [
   ({ style }) => (
     <AnimatedPage style={{ ...style, backgroundColor: 'red' }}>
-      <Title>A</Title>
+      <Title>R</Title>
     </AnimatedPage>
   ),
   ({ style }) => (
     <AnimatedPage style={{ ...style, backgroundColor: 'green' }}>
-      <Title>B</Title>
+      <Title>G</Title>
     </AnimatedPage>
   ),
   ({ style }) => (
     <AnimatedPage style={{ ...style, backgroundColor: 'blue' }}>
-      <Title>C</Title>
+      <Title>B</Title>
     </AnimatedPage>
   ),
 ];
@@ -25,17 +25,22 @@ const pages = [
 export const App = () => {
   const [index, set] = useState(0);
   const onTouchStart = useCallback(() => set(state => (state + 1) % 3), []);
+
+  const { width } = Dimensions.get('window');
   const transitions = useTransition(index, p => p, {
-    from: { opacity: 0, transform: [{ translateX: 0 }] },
-    enter: { opacity: 1, transform: [{ translateX: 50 }] },
-    leave: { opacity: 0, transform: [{ translateX: 250 }] },
+    intitial: { opacity: 1, translateX: 0 * width },
+    from: { opacity: 0.5, translateX: -1 * width },
+    enter: { opacity: 1, translateX: 0 * width },
+    leave: { opacity: 0.5, translateX: 1 * width },
   });
 
   return (
     <Container onTouchStart={onTouchStart}>
-      {transitions.map(({ key, item, props: { opacity, transform } }) => {
+      {transitions.map(({ key, item, props: { opacity, translateX } }) => {
         const Page = pages[item];
-        return <Page key={key} style={{ opacity, transform }} />;
+        return (
+          <Page key={key} style={{ opacity, transform: [{ translateX }] }} />
+        );
       })}
     </Container>
   );
